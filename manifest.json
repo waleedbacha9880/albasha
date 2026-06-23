@@ -1,0 +1,18 @@
+{
+  "name": "Al Basha - Fast Food",
+  "short_name": "Al Basha",
+  "description": "Premium Fast Food Restaurant in Charsadda",
+  "start_url": "/albasha",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#c9a96e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
