@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Basha - Fast Food Restaurant | Charsadda</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d0d0d; color: #fff; overflow-x: hidden; }
+        nav { background: rgba(13,13,13,0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 2px solid #c9a96e; }
+        .logo { font-size: 28px; font-weight: bold; color: #c9a96e; letter-spacing: 2px; }
+        .logo span { color: #e94560; }
+        .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+        .nav-links a { color: #ccc; text-decoration: none; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
+        .nav-links a:hover { color: #c9a96e; }
+        .cart-icon { position: relative; cursor: pointer; font-size: 24px; color: #c9a96e; }
+        .cart-count { position: absolute; top: -10px; right: -10px; background: #e94560; color: #fff; font-size: 11px; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .order-btn { background: #e94560; color: #fff !important; padding: 10px 25px; border-radius: 25px; }
+        .order-btn:hover { background: #c0392b !important; color: #fff !important; }
+        .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; }
+        .cart-overlay.active { display: block; }
+        .cart-sidebar { position: fixed; top: 0; right: -450px; width: 400px; height: 100%; background: #1a1a1a; z-index: 2001; transition: right 0.3s; display: flex; flex-direction: column; border-left: 2px solid #c9a96e; }
+        .cart-sidebar.active { right: 0; }
+        .cart-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h3 { color: #c9a96e; font-size: 20px; }
+        .cart-close { background: none; border: none; color: #e94560; font-size: 28px; cursor: pointer; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { background: #222; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-item-info h4 { font-size: 14px; color: #fff; }
+        .cart-item-info p { font-size: 12px; color: #888; margin-top: 3px; }
+        .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 16px; cursor: pointer; color: #fff; font-weight: bold; }
+        .qty-minus { background: #e94560; }
+        .qty-plus { background: #2ecc71; }
+        .qty-remove { background: #555; font-size: 12px; }
+        .cart-footer { padding: 20px; border-top: 1px solid #333; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #c9a96e; }
+        .btn-cart { padding: 14px; border-radius: 10px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: #fff; width: 100%; }
+        .btn-whatsapp { background: #25D366; }
+        .btn-whatsapp:hover { background: #1da851; }
+        .btn-clear { background: #555; }
+        .btn-clear:hover { background: #777; }
+        .empty-cart { text-align: center; color: #888; padding: 60px 20px; font-size: 18px; }
+        .hero { height: 100vh; background: linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.75)),url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1600'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .hero-content h1 { font-size: 70px; color: #c9a96e; margin-bottom: 10px; letter-spacing: 3px; }
+        .hero-content h1 span { color: #e94560; }
+        .hero-content p { font-size: 22px; color: #ccc; margin-bottom: 30px; }
+        .hero-buttons { display: flex; gap: 20px; justify-content: center; }
+        .btn { padding: 15px 35px; border-radius: 30px; font-size: 16px; font-weight: bold; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; cursor: pointer; border: none; color: #fff; }
+        .btn-primary { background: #e94560; }
+        .btn-primary:hover { background: #c0392b; transform: translateY(-3px); }
+        .btn-secondary { background: transparent; color: #c9a96e; border: 2px solid #c9a96e; }
+        .btn-secondary:hover { background: #c9a96e; color: #0d0d0d; transform: translateY(-3px); }
+        section { padding: 80px 50px; }
+        .section-title { text-align: center; margin-bottom: 60px; }
+        .section-title h2 { font-size: 40px; color: #c9a96e; margin-bottom: 10px; }
+        .section-title p { color: #888; font-size: 16px; }
+        .section-title .line { width: 60px; height: 3px; background: #e94560; margin: 15px auto; }
+        #menu { background: #141414; }
+        .menu-categories { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .menu-cat-btn { padding: 10px 25px; border: 1px solid #333; background: transparent; color: #888; border-radius: 25px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .menu-cat-btn:hover, .menu-cat-btn.active { background: #c9a96e; color: #0d0d0d; border-color: #c9a96e; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .menu-item { background: #1a1a1a; border-radius: 15px; overflow: hidden; transition: transform 0.3s; border: 1px solid #222; }
+        .menu-item:hover { transform: translateY(-5px); border-color: #c9a96e; }
+        .menu-item-img { height: 200px; background-size: cover; background-position: center; }
+        .menu-item-info { padding: 20px; }
+        .menu-item-info h3 { font-size: 18px; margin-bottom: 5px; color: #fff; }
+        .menu-item-info .desc { color: #888; font-size: 13px; margin-bottom: 15px; }
+        .menu-item-bottom { display: flex; justify-content: space-between; align-items: center; }
+        .menu-item-info .price { font-size: 22px; color: #c9a96e; font-weight: bold; }
+        .add-to-cart-btn { background: #e94560; color: #fff; border: none; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        .add-to-cart-btn:hover { background: #c0392b; }
+        .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .feature-card { text-align: center; padding: 30px; background: #141414; border-radius: 10px; border: 1px solid #222; }
+        .feature-icon { font-size: 40px; margin-bottom: 15px; }
+        .feature-card h4 { color: #c9a96e; margin-bottom: 10px; }
+        .feature-card p { color: #888; font-size: 13px; }
+        #about { background: #0d0d0d; }
+        .about-content { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; max-width: 1200px; margin: 0 auto; align-items: center; }
+        .about-text h3 { font-size: 28px; color: #c9a96e; margin-bottom: 20px; }
+        .about-text p { color: #aaa; line-height: 1.8; margin-bottom: 20px; font-size: 15px; }
+        .about-image { height: 400px; border-radius: 15px; background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'); background-size: cover; background-position: center; border: 2px solid #c9a96e; }
+        #contact { background: #141414; }
+        .contact-container { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; max-width: 1200px; margin: 0 auto; }
+        .contact-info h3 { font-size: 24px; color: #c9a96e; margin-bottom: 25px; }
+        .contact-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; color: #aaa; }
+        .contact-icon { font-size: 24px; width: 50px; height: 50px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #333; }
+        footer { background: #0a0a0a; padding: 40px 50px; text-align: center; border-top: 2px solid #c9a96e; }
+        footer p { color: #888; margin-bottom: 10px; }
+        footer .gold { color: #c9a96e; }
+        .popup { position: fixed; top: 20px; right: 20px; background: #2ecc71; color: #fff; padding: 15px 25px; border-radius: 10px; z-index: 3000; font-weight: bold; display: none; }
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .nav-links { gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .nav-links a { font-size: 12px; }
+            .hero-content h1 { font-size: 40px; }
+            section { padding: 50px 20px; }
+            .about-content, .contact-container { grid-template-columns: 1fr; }
+            .features { grid-template-columns: repeat(2, 1fr); }
+            .menu-grid { grid-template-columns: 1fr; }
+            .cart-sidebar { width: 100%; right: -100%; }
+        }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+
+    <div class="popup" id="popup">✅ Added to cart!</div>
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>🛒 Your Order</h3>
+            <button class="cart-close" onclick="closeCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="empty-cart"><p style="font-size:40px">🛒</p><p>Your cart is empty</p></div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">Rs. 0</span></div>
+            <button class="btn-cart btn-whatsapp" onclick="orderViaWhatsApp()">📱 Order via WhatsApp</button>
+            <button class="btn-cart btn-clear" onclick="clearCart()" style="margin-top:8px">🗑️ Clear Cart</button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo">AL <span>BASHA</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="cart-icon" onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span></li>
+        </ul>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>AL <span>BASHA</span></h1>
+            <p>Premium Fast Food Experience in Charsadda</p>
+            <div class="hero-buttons">
+                <a href="#menu" class="btn btn-primary">View Menu</a>
+                <button class="btn btn-secondary" onclick="openCart()">🛒 View Cart</button>
+            </div>
+        </div>
+    </section>
+
+    <section style="background:#141414;padding:50px;">
+        <div class="features">
+            <div class="feature-card"><div class="feature-icon">🍔</div><h4>Fresh Food</h4><p>Made with premium ingredients</p></div>
+            <div class="feature-card"><div class="feature-icon">🚀</div><h4>Fast Service</h4><p>Quick preparation & delivery</p></div>
+            <div class="feature-card"><div class="feature-icon">🏠</div><h4>Dine-in & Delivery</h4><p>Enjoy at our place or yours</p></div>
+            <div class="feature-card"><div class="feature-icon">💯</div><h4>Halal</h4><p>100% Halal certified food</p></div>
+        </div>
+    </section>
+
+    <section id="menu">
+        <div class="section-title"><h2>Our Menu</h2><div class="line"></div><p>Click items to add to your cart</p></div>
+        <div class="menu-categories">
+            <button class="menu-cat-btn active" onclick="filterMenu('all')">All</button>
+            <button class="menu-cat-btn" onclick="filterMenu('burgers')">🍔 Burgers</button>
+            <button class="menu-cat-btn" onclick="filterMenu('wraps')">🌯 Wraps & Rolls</button>
+            <button class="menu-cat-btn" onclick="filterMenu('sandwiches')">🥪 Sandwiches</button>
+            <button class="menu-cat-btn" onclick="filterMenu('fries')">🍟 Fries & Sides</button>
+            <button class="menu-cat-btn" onclick="filterMenu('drinks')">🥤 Drinks</button>
+        </div>
+        <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <section id="about">
+        <div class="section-title"><h2>About Al Basha</h2><div class="line"></div><p>Your favorite fast food destination</p></div>
+        <div class="about-content">
+            <div class="about-text">
+                <h3>Serving Quality Fast Food Since Day One</h3>
+                <p>Al Basha is Charsadda's premium fast food restaurant, dedicated to serving delicious, fresh, and high-quality meals.</p>
+                <p>We believe in providing exceptional taste with fast and friendly service.</p>
+                <p><strong style="color:#c9a96e;">100% Halal | Fresh Ingredients | Fast Service</strong></p>
+            </div>
+            <div class="about-image"></div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="section-title"><h2>Contact & Location</h2><div class="line"></div><p>Visit us or call to order</p></div>
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Visit Our Restaurant</h3>
+                <div class="contact-item"><div class="contact-icon">📍</div><div><strong style="color:#c9a96e;">Address</strong><br>Gul Bahar Colony No.1<br>Mardan Road, Charsadda</div></div>
+                <div class="contact-item"><div class="contact-icon">📞</div><div><strong style="color:#c9a96e;">Phone</strong><br>+92 312 0086000</div></div>
+                <div class="contact-item"><div class="contact-icon">🕐</div><div><strong style="color:#c9a96e;">Hours</strong><br>Monday - Sunday<br>12:00 PM - 12:00 AM</div></div>
+            </div>
+            <div style="color:#aaa;display:flex;align-items:center;justify-content:center;font-size:60px;">🍔🍟🥤</div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="font-size:24px;font-weight:bold;margin-bottom:5px;">AL <span class="gold">BASHA</span></p>
+        <p>Premium Fast Food Restaurant</p>
+        <p style="margin-top:15px;">Gul Bahar Colony No.1, Mardan Road, Charsadda | 📞 +92 312 0086000</p>
+        <p style="margin-top:20px;font-size:12px;">&copy; 2026 Al Basha. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Menu Data
+        const menuItems = [
+            { name: "Zinger Burger", category: "burgers", price: 500, desc: "Crispy fried chicken fillet with lettuce & mayo", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" },
+            { name: "Beef Burger", category: "burgers", price: 450, desc: "Juicy beef patty with cheese & special sauce", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600" },
+            { name: "Chicken Burger", category: "burgers", price: 400, desc: "Grilled chicken with fresh vegetables", img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600" },
+            { name: "Chicken Tikka Wrap", category: "wraps", price: 550, desc: "Spicy chicken tikka wrapped in paratha", img: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=600" },
+            { name: "Zinger Roll", category: "wraps", price: 480, desc: "Crispy zinger rolled with fresh veggies", img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=600" },
+            { name: "Club Sandwich", category: "sandwiches", price: 650, desc: "Triple-decker with chicken, egg & cheese", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600" },
+            { name: "Chicken Sandwich", category: "sandwiches", price: 400, desc: "Grilled chicken with lettuce & dressing", img: "https://images.unsplash.com/photo-1475090169767-40ed8d18f67d?w=600" },
+            { name: "French Fries", category: "fries", price: 250, desc: "Crispy golden fries with ketchup", img: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600" },
+            { name: "Chicken Nuggets (6pcs)", category: "fries", price: 350, desc: "Crispy chicken nuggets with dip", img: "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600" },
+            { name: "Onion Rings", category: "fries", price: 300, desc: "Crispy battered onion rings", img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600" },
+            { name: "Soft Drink", category: "drinks", price: 150, desc: "Pepsi, Coke, Sprite, Fanta, Pakola", img: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=600" },
+            { name: "Milkshake", category: "drinks", price: 400, desc: "Chocolate, Vanilla, Strawberry", img: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=600" },
+            { name: "Mineral Water", category: "drinks", price: 100, desc: "Nestle Pure Life", img: "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600" }
+        ];
+
+        let cart = [];
+
+        function renderMenu(filter = 'all') {
+            const grid = document.getElementById('menuGrid');
+            let items = filter === 'all' ? menuItems : menuItems.filter(i => i.category === filter);
+            grid.innerHTML = items.map(item => `
+                <div class="menu-item" data-category="${item.category}">
+                    <div class="menu-item-img" style="background-image: url('${item.img}')"></div>
+                    <div class="menu-item-info">
+                        <h3>${item.name}</h3>
+                        <p class="desc">${item.desc}</p>
+                        <div class="menu-item-bottom">
+                            <p class="price">Rs. ${item.price}</p>
+                            <button class="add-to-cart-btn" onclick="addToCart('${item.name}', ${item.price})">+ Add</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMenu(category) {
+            document.querySelectorAll('.menu-cat-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMenu(category);
+        }
+
+        function addToCart(name, price) {
+            let existing = cart.find(i => i.name === name);
+            if (existing) { existing.quantity++; }
+            else { cart.push({ name, price, quantity: 1 }); }
+            updateCart();
+            showPopup();
+        }
+
+        function showPopup() {
+            const p = document.getElementById('popup');
+            p.style.display = 'block';
+            setTimeout(() => p.style.display = 'none', 1500);
+        }
+
+        function updateCart() {
+            const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            const count = cart.reduce((s, i) => s + i.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+            document.getElementById('cartTotal').textContent = 'Rs. ' + total.toLocaleString();
+            
+            const container = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="empty-cart"><p style="font-size:40px">🛒</p><p>Your cart is empty</p></div>';
+            } else {
+                container.innerHTML = cart.map((item, i) => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>Rs. ${item.price} x ${item.quantity} = Rs. ${(item.price * item.quantity).toLocaleString()}</p>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn qty-minus" onclick="changeQty(${i}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="qty-btn qty-plus" onclick="changeQty(${i}, 1)">+</button>
+                            <button class="qty-btn qty-remove" onclick="removeItem(${i})">x</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function changeQty(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            updateCart();
+        }
+
+        function removeItem(index) { cart.splice(index, 1); updateCart(); }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm('Clear your entire cart?')) { cart = []; updateCart(); }
+        }
+
+        function openCart() {
+            document.getElementById('cartOverlay').classList.add('active');
+            document.getElementById('cartSidebar').classList.add('active');
+        }
+
+        function closeCart() {
+            document.getElementById('cartOverlay').classList.remove('active');
+            document.getElementById('cartSidebar').classList.remove('active');
+        }
+
+        function orderViaWhatsApp() {
+            if (cart.length === 0) { alert('Your cart is empty!'); return; }
+            const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            let msg = '*Al Basha - New Order*%0A%0A';
+            cart.forEach(i => { msg += `- ${i.quantity}x ${i.name} (Rs. ${i.price * i.quantity})%0A`; });
+            msg += `%0A*Total: Rs. ${total}*%0A%0A`;
+            msg += 'Please confirm my order. Thank you!';
+            window.open(`https://wa.me/923120086000?text=${msg}`, '_blank');
+        }
+
+        // Init
+        renderMenu();
+        updateCart();
+    </script>
+</body>
+</html>
